@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blood Bank Management System</title>
+<style>
+  /* --- General Body and Typography --- */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa; /* Light grey background */
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+  }
+
+  /* --- Main Container --- */
+  .container {
+    max-width: 800px;
+    margin: 20px auto; /* Center the content */
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* --- Headings --- */
+  h2, h3 {
+    color: #d9534f; /* A theme-appropriate red color */
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 2em;
+  }
+
+  /* --- Form Styling --- */
+  form {
+    background-color: #fdfdfd;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #555;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%; /* Full width for responsiveness */
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-sizing: border-box; /* Important for padding and width */
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  select:focus {
+    border-color: #d9534f;
+    box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.2);
+    outline: none;
+  }
+
+  /* --- Button Styling --- */
+  button {
+    background-color: #d9534f;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: auto; /* Allow button to size to its content */
+    transition: background-color 0.2s, transform 0.2s;
+    display: block; /* Make it a block to easily center it */
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  button:hover {
+    background-color: #c9302c; /* Darker red on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+  }
+
+  /* --- Table Styling --- */
+  table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  th, td {
+    border: 1px solid #dee2e6;
+    padding: 12px 15px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #d9534f;
+    color: #ffffff;
+    font-size: 1.1em;
+  }
+
+  /* Zebra-striping for table rows */
+  tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  tbody tr:hover {
+    background-color: #e9ecef; /* Highlight row on hover */
+  }
+  
+  td:last-child {
+      font-weight: bold;
+      text-align: center;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Blood Bank Management System</h2>
+
+  <h3>Register Donor</h3>
+  <form id="donorForm">
+    <label for="donorName">Name:</label>
+    <input type="text" id="donorName" required placeholder="e.g., John Doe" />
+
+    <label for="donorBloodGroup">Blood Group:</label>
+    <select id="donorBloodGroup" required>
+      <option value="">Select a blood group</option>
+      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+      <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+    </select>
+    
+    <label for="donorContact">Contact:</label>
+    <input type="text" id="donorContact" required placeholder="e.g., 555-1234"/>
+    
+    <button type="submit">Register Donor</button>
+  </form>
+
+  <h3>Add Blood Donation</h3>
+  <form id="donationForm">
+    <label for="donorSelect">Donor Name:</label>
+    <select id="donorSelect" required>
+      <option value="">Select donor</option>
+    </select>
+    
+    <label for="donationQty">Quantity (units):</label>
+    <input type="number" id="donationQty" min="1" required placeholder="e.g., 1"/>
+    
+    <button type="submit">Add Donation</button>
+  </form>
+
+  <h3>Current Blood Inventory</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Blood Group</th>
+        <th>Quantity (units)</th>
+      </tr>
+    </thead>
+    <tbody id="inventoryTableBody">
+      <!-- Inventory data goes here -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Data storage
+  const donors = [];
+  const inventory = {
+      'A+': 0, 'A-': 0, 'B+': 0, 'B-': 0,
+      'AB+': 0, 'AB-': 0, 'O+': 0, 'O-': 0
+  };
+
+  // DOM Elements
+  const donorForm = document.getElementById('donorForm');
+  const donorNameInput = document.getElementById('donorName');
+  const donorBloodGroupSelect = document.getElementById('donorBloodGroup');
+  const donorContactInput = document.getElementById('donorContact');
+  const donorSelect = document.getElementById('donorSelect');
+
+  const donationForm = document.getElementById('donationForm');
+  const donationQtyInput = document.getElementById('donationQty');
+
+  const inventoryTableBody = document.getElementById('inventoryTableBody');
+
+  // Register donor
+  donorForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = donorNameInput.value.trim();
+    const bloodGroup = donorBloodGroupSelect.value;
+    const contact = donorContactInput.value.trim();
+
+    if (name && bloodGroup && contact) {
+      // Check if donor with the same name and blood group already exists
+      const existingDonor = donors.find(d => d.name.toLowerCase() === name.toLowerCase() && d.bloodGroup === bloodGroup);
+      if (existingDonor) {
+          alert(`Donor ${name} with blood group ${bloodGroup} is already registered.`);
+          return;
+      }
+      
+      donors.push({ name, bloodGroup, contact });
+      alert(`Donor ${name} registered!`);
+      donorForm.reset();
+      updateDonorSelect();
+    }
+  });
+
+  // Update donor dropdown for donation form
+  function updateDonorSelect() {
+    donorSelect.innerHTML = '<option value="">Select donor</option>';
+    donors.forEach((donor, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.textContent = `${donor.name} (${donor.bloodGroup})`;
+      donorSelect.appendChild(option);
+    });
+  }
+
+  // Add donation
+  donationForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const donorIndex = donorSelect.value;
+    const qty = parseInt(donationQtyInput.value);
+
+    if (donorIndex === '' || !qty || qty <= 0) {
+      alert('Please select a donor and enter a valid quantity.');
+      return;
+    }
+
+    const donor = donors[donorIndex];
+    const bg = donor.bloodGroup;
+
+    // inventory object is pre-filled, so no need for `if (!inventory[bg])`
+    inventory[bg] += qty;
+
+    alert(`Added ${qty} unit(s) of ${bg} blood to inventory.`);
+    donationForm.reset();
+    updateInventoryTable();
+  });
+
+  // Update inventory display
+  function updateInventoryTable() {
+    inventoryTableBody.innerHTML = '';
+    
+    // Sort the blood groups for a consistent order
+    const sortedGroups = Object.keys(inventory).sort();
+
+    sortedGroups.forEach(bg => {
+      const row = document.createElement('tr');
+      
+      const groupCell = document.createElement('td');
+      groupCell.textContent = bg;
+      
+      const qtyCell = document.createElement('td');
+      qtyCell.textContent = inventory[bg];
+      
+      row.appendChild(groupCell);
+      row.appendChild(qtyCell);
+      inventoryTableBody.appendChild(row);
+    });
+  }
+
+  // Initialize the inventory table on page load
+  updateInventoryTable();
+</script>
+
+</body>
+</html>
